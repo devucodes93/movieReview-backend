@@ -25,6 +25,7 @@ app.use(
     origin: [
       "https://4hvsjl49-5173.inc1.devtunnels.ms/",
       "http://localhost:5173",
+      "https://cine-track1.vercel.app/",
     ],
     credentials: true,
   })
