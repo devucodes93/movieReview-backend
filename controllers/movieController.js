@@ -1,4 +1,4 @@
-import { Movie } from "../models/movieModel.js";
+import { Movie } from "../models/MovieModel.js";
 import Review from "../models/Review.js";
 
 import ReviewModel from "../models/Review.js";
