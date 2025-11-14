@@ -22,11 +22,7 @@ app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 // https://reelxplore93.web.app
 app.use(
   cors({
-    origin: [
-      "https://4hvsjl49-5173.inc1.devtunnels.ms/",
-      "http://localhost:5173",
-      "https://cine-track1.vercel.app/",
-    ],
+    origin: ["*"],
     credentials: true,
   })
 );
