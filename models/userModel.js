@@ -4,16 +4,7 @@ const userSchema = mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phoneNumber: { type: String, default: null },
-    profilePic: {
-      type: String,
-      default: "",
-    },
-    followers: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "AppUser", default: [] },
-    ],
-    following: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "AppUser", default: [] },
-    ],
+
     password: { type: String, default: "" },
   },
   {
@@ -21,5 +12,5 @@ const userSchema = mongoose.Schema(
   }
 );
 
-const User = mongoose.model("AppUser", userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

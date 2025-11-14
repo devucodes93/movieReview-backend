@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const storySchema = mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "AppUser" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "MovieRate" },
     story: { type: String, required: true },
-    viewedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "AppUser" }],
+    viewedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "MovieRate" }],
     isVideo: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
   },
@@ -13,5 +13,5 @@ const storySchema = mongoose.Schema(
   }
 );
 storySchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
-const Story = mongoose.model("Story", storySchema);
-export default Story;
+export const Story = mongoose.model("Story", storySchema);
+

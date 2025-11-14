@@ -1,11 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/generateToken.js";
-import { OAuth2Client } from "google-auth-library";
-import Blacklisted from "../models/BlacklistedModel.js";
-import Post from "../models/PostModel.js";
-import jwt from "jsonwebtoken";
-import cloudinary from "../lib/cloudinary.js";
+
 export const checkAuth = async (req, res) => {
   try {
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
@@ -30,14 +26,6 @@ export const checkAuth = async (req, res) => {
 };
 export const signUp = async (req, res) => {
   const { name, email, phoneNumber, password } = req.body;
-  const { profilePic } = req.body;
-  console.log(profilePic);
-  let profilePicUrl = null;
-  if (profilePic) {
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    console.log(uploadResponse);
-    profilePicUrl = uploadResponse.secure_url;
-  }
 
   if (!name || !email || !phoneNumber || !password)
     return res
@@ -65,7 +53,6 @@ export const signUp = async (req, res) => {
     email,
     phoneNumber,
     password: hashedPassword,
-    profilePic: profilePicUrl,
   });
 
   await newUser.save();
@@ -80,6 +67,7 @@ export const signUp = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   if (!email || !password)
     return res
       .status(400)
@@ -105,97 +93,6 @@ export const logout = async (req, res) => {
   if (!token) return res.status(400).json({ message: "No token provided" });
   res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "none" });
   // Add the token to the blacklist
-  const blacklistedToken = new Blacklisted({ token });
-  await blacklistedToken.save();
 
   return res.status(200).json({ message: "Logout successful", success: true });
-};
-export const getAllUsers = async (req, res) => {
-  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-  if (!token)
-    return res
-      .status(400)
-      .json({ message: "No token provided", success: false });
-  const userId = jwt.verify(token, process.env.JWT_SECRET);
-  const user = await User.findById(userId.id).select("-password");
-  if (!user)
-    return res.status(401).json({ message: "User not found", success: false });
-  const users = await User.find({ _id: { $ne: user._id } }).select("-password");
-  return res.status(200).json({
-    message: "Users fetched for story successfully",
-    success: true,
-    users,
-  });
-};
-export const userDetails = async (req, res) => {
-  const { userId } = req.query;
-  try {
-    if (!userId) return res.status(401).json({ message: "userId is missing" });
-    const user = await User.findById(userId).select("-password");
-    const userPosts = await Post.find({ user: userId }).populate("user");
-    if (!user) return res.status(401).json({ message: "User not found" });
-    res
-      .status(200)
-      .json({ message: "user fetched successfully", userPosts, user });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
-  }
-};
-
-export const authUserPosts = async (req, res) => {
-  const userId = req.user.id;
-
-  try {
-    const userPosts = await Post.find({ user: userId }).populate("user");
-
-    if (!userPosts) return res.status(401).json({ message: "No posts found" });
-    res
-      .status(201)
-      .json({ message: "auth user posts fetched successfully", userPosts });
-  } catch (error) {
-    res.json({ error: error.message });
-  }
-};
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-export const googleAuth = async (req, res) => {
-  const { token } = req.body;
-
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    const { email, name, picture, sub } = payload;
-
-    let user = await User.findOne({ email });
-
-    if (!user) {
-      user = await User.create({
-        email,
-        name,
-        profilePic:
-          picture !== ""
-            ? picture
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                name
-              )}&background=random`,
-        password: "",
-        phoneNumber: "",
-      });
-    }
-
-    const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    res.status(200).json({ token: jwtToken, user });
-  } catch (err) {
-    console.error("Google Auth Error:", err);
-    res.status(401).json({ error: "Google login failed" });
-  }
 };

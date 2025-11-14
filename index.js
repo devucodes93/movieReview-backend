@@ -2,8 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import userRouter from "./routes/userRoute.js";
-import postRouter from "./routes/postRoute.js";
-import storyRouter from "./routes/storyRoute.js";
+import moviesRouter from "./routes/moviesRoute.js";
 import cookieParser from "cookie-parser";
 import { dbConnect } from "./lib/db.js";
 dotenv.config();
@@ -24,15 +23,8 @@ app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use(
   cors({
     origin: [
+      "https://4hvsjl49-5173.inc1.devtunnels.ms/",
       "http://localhost:5173",
-      "https://wk75j4x5-5173.inc1.devtunnels.ms",
-      "https://reelxplore93.netlify.app",
-      "https://reelsxplore93.netlify.app",
-
-      "https://vybe.netlify.app",
-      "https://vybeReel.netlify.app",
-      "https://vybereel.netlify.app",
-      "https://vybereel93.netlify.app",
     ],
     credentials: true,
   })
@@ -47,8 +39,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/auth", userRouter);
-app.use("/api/post", postRouter);
-app.use("/api/story", storyRouter);
+app.use("/api/movies", moviesRouter);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
