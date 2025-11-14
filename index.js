@@ -7,8 +7,15 @@ import cookieParser from "cookie-parser";
 import { dbConnect } from "./lib/db.js";
 dotenv.config();
 /**/
+
 const app = express();
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://cine-track1.vercel.app/"],
+    credentials: true,
+  })
+);
 app.use(
   express.static("public", {
     maxAge: "1y", // or 31536000000 ms
@@ -19,13 +26,6 @@ app.use(
 );
 app.use(express.json({ limit: "500mb" }));
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
-
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://cine-track1.vercel.app/"],
-    credentials: true,
-  })
-);
 
 dbConnect();
 app.use((req, res, next) => {
