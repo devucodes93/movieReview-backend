@@ -5,6 +5,7 @@ import ReviewModel from "../models/Review.js";
 export const serveMovies = async (req, res) => {
   const user = req.user;
   if (!user) {
+    console.log("unauthorized");
     return res.status(401).json({ message: "Unauthorized", success: false });
   }
   // Fetch movies from database or any other source
